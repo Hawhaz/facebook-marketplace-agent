@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  facebook-marketplace-agent:
+    build: .
+    container_name: fb-marketplace-agent
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=sqlite:///./data/app.db
+      - HEADLESS_BROWSER=true
+      - DEBUG=false
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./images:/app/images
+      - ./.env:/app/.env:ro
+    restart: unless-stopped
+    networks:
+      - fb-agent-network
+    # Uncomment if you need to access the container's display
+    # environment:
+    #   - DISPLAY=${DISPLAY}
+    # volumes:
+    #   - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    # network_mode: host
+
+  # Optional: Add a database service if you want to use PostgreSQL instead of SQLite
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: fb-agent-postgres
+  #   environment:
+  #     POSTGRES_DB: facebook_marketplace
+  #     POSTGRES_USER: fbagent
+  #     POSTGRES_PASSWORD: your_secure_password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - fb-agent-network
+
+  # Optional: Add Redis for caching
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: fb-agent-redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - fb-agent-network
+  #   command: redis-server --appendonly yes
+  #   volumes:
+  #     - redis_data:/data
+
+networks:
+  fb-agent-network:
+    driver: bridge
+
+# volumes:
+#   postgres_data:
+#   redis_data:
